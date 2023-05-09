@@ -14,7 +14,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class CatEyeClient {
-    List<Film> films;
+    public static final String LOCAL = "local";
+    public static final String REMOTE = "remote";
+    private List<Film> films;
+    private String readMode = LOCAL;
 
     private JSONObject hot() {
         return OkHttps.sync("https://i.maoyan.com/api/mmdb/movie/v3/list/hot.json")
@@ -51,28 +54,41 @@ public class CatEyeClient {
         init();
     }
 
+    public CatEyeClient(String readMode) {
+        this.readMode = readMode;
+        init();
+    }
+
     private void init() {
         films = getAllFilms();
     }
 
+    private List<Film> readLocal() {
+        System.out.println("读本地文件");
+        return JSONArray.parseArray(IO.readContentAsString(new File("data.json")), Film.class);
+    }
+
+
     private List<Film> getAllFilms() {
-        try {
-            //尝试获取新数据 获取失败 就读取本地 data.json 文件
-            JSONObject hot = hot();
-            List<Film> films = JSONArray.parseArray(hot.getString("hot"), Film.class);
-            List<Long> movieIds = hot.getJSONArray("movieIds")
-                    .stream().map(o -> Long.parseLong(o.toString()))
-                    .collect(Collectors.toList());
-            List<Long> existIds = films.stream().map(Film::getId).collect(Collectors.toList());
-            List<Long> notExistIds = movieIds.stream().filter(i -> !existIds.contains(i)).collect(Collectors.toList());
-            films.addAll(moreComingList(notExistIds));
-            System.out.println("网络请求获取");
-            return films;
-        } catch (Exception e) {
-            //返回 data.json 文件
-            System.out.println("读本地文件");
-            return JSONArray.parseArray(IO.readContentAsString(new File("data.json")), Film.class);
-        }
+        if (readMode.equals(LOCAL)) {
+            return readLocal();
+        } else
+            try {
+                //尝试获取新数据 获取失败 就读取本地 data.json 文件
+                JSONObject hot = hot();
+                List<Film> films = JSONArray.parseArray(hot.getString("hot"), Film.class);
+                List<Long> movieIds = hot.getJSONArray("movieIds")
+                        .stream().map(o -> Long.parseLong(o.toString()))
+                        .collect(Collectors.toList());
+                List<Long> existIds = films.stream().map(Film::getId).collect(Collectors.toList());
+                List<Long> notExistIds = movieIds.stream().filter(i -> !existIds.contains(i)).collect(Collectors.toList());
+                films.addAll(moreComingList(notExistIds));
+                System.out.println("网络请求获取");
+                return films;
+            } catch (Exception e) {
+                //返回 data.json 文件
+                return readLocal();
+            }
     }
 
     public static void main(String[] args) {
@@ -80,7 +96,7 @@ public class CatEyeClient {
         System.out.println(client.getFilms());
     }
 
-    private List<Film> getFilms() {
+    public List<Film> getFilms() {
         return films;
     }
 }
