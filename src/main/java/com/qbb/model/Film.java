@@ -4,17 +4,17 @@ import java.util.Date;
 
 public class Film {
 
-    private long id;
+    private long id; //影片id
     private boolean haspromotionTag;
-    private String img;
+    private String img; //图片
     private String version;
-    private String nm;
-    private boolean preShow;
+    private String nm; //名称
+    private boolean preShow; //是否预售
     private int sc;
     private boolean globalReleased;
     private int wish;
-    private String star;
-    private Date rt;
+    private String star; //演员
+    private Date rt; //上映时间
     private String showInfo;
     private int showst;
     private int wishst;
