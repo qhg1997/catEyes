@@ -1,5 +1,7 @@
 package com.qbb.model;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class Seat {
 
     private String columnId;
@@ -59,6 +61,7 @@ public class Seat {
 
     public String getNo() {
 
-        return this.rowId.isEmpty() || this.columnId.isEmpty() ? "" : String.format("%02d", Integer.valueOf(this.getRowId())) + ":" + String.format("%02d", Integer.valueOf(this.getColumnId()));
+
+        return this.rowId.isEmpty() || this.columnId.isEmpty() ? "" : (StringUtils.isNumeric(this.rowId)? String.format("%02d",Integer.valueOf(this.getRowId())):this.rowId )+ ":" +( StringUtils.isNumeric(this.columnId)? String.format("%02d", Integer.valueOf(this.getColumnId())):this.columnId);
     }
 }

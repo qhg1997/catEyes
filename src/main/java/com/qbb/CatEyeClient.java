@@ -122,7 +122,7 @@ public class CatEyeClient {
     public List<Cinema> cinemas(Long movieId, String showDate) {
         JSONObject object = http.async("https://m.maoyan.com/api/mtrade/mmcs/cinema/v2/select/movie/cinemas.json")
                 .addUrlPara("movieId", movieId)
-                .addUrlPara("movieId", showDate)
+                .addUrlPara("showDate", showDate)
                 .addUrlPara("channelId", "4")
                 .addUrlPara("limit", "20")
                 .addUrlPara("offset", "0")

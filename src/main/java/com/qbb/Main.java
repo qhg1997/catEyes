@@ -1,6 +1,5 @@
 package com.qbb;
 
-
 import cn.hutool.core.lang.ConsoleTable;
 import cn.hutool.db.meta.Column;
 import cn.hutool.db.meta.Table;
@@ -14,7 +13,7 @@ public class Main {
     Scanner scanner = new Scanner(System.in);
 
     void showInfo() {
-        System.out.println("请选择影片：");
+        System.out.println("请选择影片: ");
         List<Film> films = catEyeClient.getFilms();
         int index = 1;
         for (Film film : films) {
@@ -26,10 +25,9 @@ public class Main {
             index++;
         }
 
-
         int choice;
         while (true) {
-            System.out.print("请输入序号选择电影:");
+            System.out.print("请输入序号选择电影: ");
             choice = scanner.nextInt();
 
             // 验证输入序号的合法性
@@ -44,91 +42,158 @@ public class Main {
         Film chosenFilm = films.get(choice - 1);
         System.out.println("您选择的电影是: " + chosenFilm.getNm());
 
-
-//        CatEyeClient client = new CatEyeClient();  // 创建 CatEyeClient 对象
-
-
-        // 让用户选择一个电影，并获取其ID（这里假设用户选择了第一个电影）
-        Long movieId = chosenFilm.getId();
-
         // 获取电影的放映日期列表
+//        Long movieId = chosenFilm.getId();
+//        List<String> dates = catEyeClient.showDays(movieId);
+        // 获取电影的放映日期列表
+        Long movieId = chosenFilm.getId();
         List<String> dates = catEyeClient.showDays(movieId);
 
-        // 让用户选择一个放映日期，并获取其值（这里假设用户选择了第一个放映日期）
-        String showDate = dates.get(0);
-        // 获取电影的影院信息
-        List<Cinema> cinemas = catEyeClient.cinemas(movieId, showDate);
-        System.out.println("以下是电影: '" + chosenFilm.getNm() + "' 的场次信息: ");
-
-        // 遍历影院列表
-        int count = 1;
-        for (Cinema cinema : cinemas) {
-            System.out.println("场次序号：" + count);
-            System.out.println("影院名称：" + cinema.getName());
-            System.out.println("影院地址：" + cinema.getAddr());
-            count++;
-
-            // 获取电影的场次信息
-            List<MoviePList> moviePLists = cinema.showTimes(showDate, movieId);
-
-            for (MoviePList moviePList : moviePLists) {
-
-                System.out.println("放映时间：" + moviePList.getTm());
-                System.out.println("影厅：" + moviePList.getTh());
-                System.out.println("票价：" + moviePList.getVipPrice());
-                System.out.println();
-                // 其他场次信息的输出...
-
-            }
-            MoviePList moviePList = moviePLists.get(0);
-            SeatRegion seats = moviePList.getSeats();
-//            System.out.println(JSONObject.toJSONString(seats));
-            System.out.println(seats.getRegionName() + " \t □未售 \t ■已售 \t ▧不可售");
-            HashMap<String, String> map = new HashMap<>();
-            for (Row row : seats.getRows()) {
-                for (Seat seat : row.getSeats()) {
-                    map.put(seat.getNo(), seat.getSeatNo());
-                    if (seat.getSeatNo().isEmpty()) {// 不是座位
-                        System.out.print("\t\t");
-                        continue;
-                    }
-                    if (seat.getSeatStatus() == 1) { //可售
-                        System.out.print("\t\t□");
-                    } else if (seat.getSeatStatus() == 3) { //已售
-                        System.out.print("\t\t■");
-                    } else if (seat.getSeatStatus() == 4) { //不可收
-                        System.out.print("\t\t▧");
-                    } else {
-                        System.out.print("\t\t");
-                    }
-                }
-                System.out.println();
-                for (Seat seat : row.getSeats()) {
-                    if (seat.getSeatNo().isEmpty()) {
-                        System.out.print("\t\t");
-                        continue;
-                    }
-                    System.out.print("\t  " + seat.getNo());
-
-                }
-                System.out.println();
-            }
-            System.out.print("请输入座位号(多个;分隔):");
-            String selectedSeats = scanner.next();
-            System.out.println();
-            System.out.println("您选的是:");
-            for (String key : selectedSeats.split(";")) {
-                System.out.println(map.get(key));
-            }
-            break;
-
+        System.out.println("以下是电影: '" + chosenFilm.getNm() + "' 的放映日期列表: ");
+        int dateIndex = 1;
+        for (String date : dates) {
+            System.out.println(dateIndex + ". " + date);
+            dateIndex++;
         }
 
+        int dateChoice;
+        while (true) {
+            System.out.print("请输入序号选择放映日期: ");
+            dateChoice = scanner.nextInt();
+
+            // 验证输入序号的合法性
+            if (dateChoice >= 1 && dateChoice <= dates.size()) {
+                break;  // 输入合法，退出循环
+            }
+
+            System.out.println("未找到对应的放映日期，请重新选择序号。");
+        }
+
+        // 根据用户选择的序号来处理对应的放映日期
+        String chosenDate = dates.get(dateChoice - 1);
+        System.out.println("您选择的放映日期是: " + chosenDate);
+
+        // 输出对应电影的影院名称和地址
+        System.out.println("以下是电影: '" + chosenFilm.getNm() + "' 的影院信息: ");
+        List<Cinema> cinemas = catEyeClient.cinemas(movieId,chosenDate);
+        System.out.println(JSONObject.toJSONString(cinemas));
+        int cinemaIndex = 1;
+        for (Cinema cinema : cinemas) {
+            System.out.println(cinemaIndex + ".影院名称: " + cinema.getName());
+            System.out.println("   影院地址: " + cinema.getAddr());
+            System.out.println();
+            cinemaIndex++;
+        }
+
+        int cinemaChoice;
+        while (true) {
+            System.out.print("请输入序号选择影院: ");
+            cinemaChoice = scanner.nextInt();
+
+            // 验证输入序号的合法性
+            if (cinemaChoice >= 1 && cinemaChoice <= cinemas.size()) {
+                break;  // 输入合法，退出循环
+            }
+
+            System.out.println("未找到对应的影院，请重新选择序号。");
+        }
+
+        // 根据用户选择的序号来处理对应的影院
+        Cinema chosenCinema = cinemas.get(cinemaChoice - 1);
+        System.out.println("您选择的影院是: " + chosenCinema.getName());
+
+        // 获取电影在选定影院的场次信息
+        List<MoviePList> moviePLists = chosenCinema.showTimes(chosenDate, movieId);
+        System.out.println("以下是电影: '" + chosenFilm.getNm() + "' 在影院: '" + chosenCinema.getName() + "' 的场次信息: ");
+
+        int showIndex = 1;
+        for (MoviePList moviePList : moviePLists) {
+            System.out.println(showIndex + ". 放映时间: " + moviePList.getTm());
+            System.out.println("   影厅: " + moviePList.getTh());
+            System.out.println("   语言版本: "+moviePList.getLang()+moviePList.getTp());
+            System.out.println("   票价: " + moviePList.getVipPrice());
+            System.out.println("");
+            showIndex++;
+        }
+
+        int showChoice;
+        while (true) {
+            System.out.print("请输入序号选择场次: ");
+            showChoice = scanner.nextInt();
+
+            // 验证输入序号的合法性
+            if (showChoice >= 1 && showChoice <= moviePLists.size()) {
+                break;  // 输入合法，退出循环
+            }
+
+            System.out.println("未找到对应的场次，请重新选择序号。");
+        }
+
+        // 根据用户选择的序号来处理对应的场次
+        MoviePList chosenShow = moviePLists.get(showChoice - 1);
+        System.out.println("您选择的场次信息如下: ");
+        System.out.println("放映时间: " + chosenShow.getTm());
+        System.out.println("影厅: " + chosenShow.getTh());
+        System.out.println("票价: " + chosenShow.getVipPrice());
+
+        // 输出座位信息
+        SeatRegion seats = chosenShow.getSeats();
+        System.out.println(seats.getRegionName() + " \t □未售 \t ■已售 \t ▧不可售");
+        HashMap<String, String> map = new HashMap<>();
+        for (Row row : seats.getRows()) {
+            for (Seat seat : row.getSeats()) {
+                map.put(seat.getNo(), seat.getSeatNo());
+                if (seat.getSeatNo().isEmpty()) {// 不是座位
+                    System.out.print("\t\t");
+                    continue;
+                }
+                if (seat.getSeatStatus() == 1) { //可售
+                    System.out.print("\t\t□");
+                } else if (seat.getSeatStatus() == 3) { //已售
+                    System.out.print("\t\t■");
+                } else if (seat.getSeatStatus() == 4) { //不可售
+                    System.out.print("\t\t▧");
+                } else {
+                    System.out.print("\t\t");
+                }
+            }
+            System.out.println();
+            for (Seat seat : row.getSeats()) {
+                if (seat.getSeatNo().isEmpty()) {
+                    System.out.print("\t\t");
+                    continue;
+                }
+                System.out.print("\t  " + seat.getNo());
+            }
+            System.out.println();
+        }
+
+        // 选择座位
+        System.out.print("请输入座位号(多个;分隔): ");
+        String selectedSeats = scanner.next();
+        System.out.println("您选择的座位如下: ");
+        for (String key : selectedSeats.split(";")) {
+            String seatStatus = map.get(key); // 获取座位状态
+            if (seatStatus != null) {
+                if (seatStatus.equals("已售")) {
+                    System.out.println(key + " 已售");
+                } else {
+                    System.out.println(key + " 可售");
+                }
+            } else {
+                System.out.println(key + " 无效座位");
+            }
+            System.out.println(map.get(key));
+        }
+
+
+
     }
+
 
     public static void main(String[] args) {
         Main main = new Main();
         main.showInfo();
-
     }
 }
+
