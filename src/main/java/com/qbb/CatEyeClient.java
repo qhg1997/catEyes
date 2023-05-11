@@ -98,11 +98,10 @@ public class CatEyeClient {
                 System.out.println("网络请求获取");
                 return films;
             } catch (Exception e) {
-                System.out.println("需要过一下滑块 https://www.maoyan.com/");
                 e.printStackTrace();
-                //返回 data.json 文件
-                return readLocal();
+                System.out.println("需要过一下滑块 https://www.maoyan.com/");
             }
+        return films;
     }
 
     public static void main(String[] args) {

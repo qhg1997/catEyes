@@ -1,14 +1,13 @@
 package com.qbb;
 
 
-import com.qbb.model.Cinema;
-import com.qbb.model.Film;
-import com.qbb.model.MoviePList;
+import cn.hutool.core.lang.ConsoleTable;
+import cn.hutool.db.meta.Column;
+import cn.hutool.db.meta.Table;
+import com.alibaba.fastjson.JSONObject;
+import com.qbb.model.*;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Scanner;
-import java.util.StringJoiner;
+import java.util.*;
 
 public class Main {
     CatEyeClient catEyeClient = new CatEyeClient(CatEyeClient.REMOTE);
@@ -81,6 +80,47 @@ public class Main {
                 // 其他场次信息的输出...
 
             }
+            MoviePList moviePList = moviePLists.get(0);
+            SeatRegion seats = moviePList.getSeats();
+//            System.out.println(JSONObject.toJSONString(seats));
+            System.out.println(seats.getRegionName() + " \t □未售 \t ■已售 \t ▧不可售");
+            HashMap<String, String> map = new HashMap<>();
+            for (Row row : seats.getRows()) {
+                for (Seat seat : row.getSeats()) {
+                    map.put(seat.getNo(), seat.getSeatNo());
+                    if (seat.getSeatNo().isEmpty()) {// 不是座位
+                        System.out.print("\t\t");
+                        continue;
+                    }
+                    if (seat.getSeatStatus() == 1) { //可售
+                        System.out.print("\t\t□");
+                    } else if (seat.getSeatStatus() == 3) { //已售
+                        System.out.print("\t\t■");
+                    } else if (seat.getSeatStatus() == 4) { //不可收
+                        System.out.print("\t\t▧");
+                    } else {
+                        System.out.print("\t\t");
+                    }
+                }
+                System.out.println();
+                for (Seat seat : row.getSeats()) {
+                    if (seat.getSeatNo().isEmpty()) {
+                        System.out.print("\t\t");
+                        continue;
+                    }
+                    System.out.print("\t  " + seat.getNo());
+
+                }
+                System.out.println();
+            }
+            System.out.print("请输入座位号(多个;分隔):");
+            String selectedSeats = scanner.next();
+            System.out.println();
+            System.out.println("您选的是:");
+            for (String key : selectedSeats.split(";")) {
+                System.out.println(map.get(key));
+            }
+            break;
 
         }
 

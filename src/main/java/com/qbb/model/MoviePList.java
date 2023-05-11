@@ -1,5 +1,6 @@
 package com.qbb.model;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ejlchina.okhttps.HTTP;
 import com.qbb.CatEyeClient;
@@ -325,12 +326,12 @@ public class MoviePList {
         return displayOriginalPr;
     }
 
-    public void getSeats() {
+    public SeatRegion getSeats() {
         HTTP http = CatEyeClient.http;
         JSONObject object = http.sync("https://m.maoyan.com/api/mtrade/seat/v8/show/seats.json")
                 .bodyType("json")
                 .addUrlPara("ts", System.currentTimeMillis() + "")
-                .addUrlPara("seqNo", "202305100585574")
+                .addUrlPara("seqNo", this.seqNo)
                 .addUrlPara("fingerprint", "")
                 .addUrlPara("userid", "")
                 .addUrlPara("ci", "42")
@@ -340,6 +341,9 @@ public class MoviePList {
                 .addHeader("x-ta", "1")
                 .addHeader("token", "AgEtIyS_pXSqhR_8DiTTIIDotqkYOb-kh2vlusWLN-wVjz82Hhk6hvIeF-w7EkIhdajR2ZYqus9cCgAAAAAtGAAAKYtjL-1xpeb4eBdkfEemNOodBHWx9tO6GoMDK9W0_4H93EOI1a5XrfWgZLMOpYaf")
                 .post().getBody().toBean(JSONObject.class);
+        if (!object.getBooleanValue("success"))
+            throw new RuntimeException(object.getString("error"));
+        return JSONArray.parseArray(object.getJSONObject("data").getJSONObject("seat").getString("regions"), SeatRegion.class).get(0);
 
     }
 }
