@@ -29,7 +29,7 @@ public class CatEyeClient {
             .build();
 
 
-    public static final COORDINATE COORDINATE = new COORDINATE("34.382082,108.913661");//坐标
+    public static final COORDINATE COORDINATE = new COORDINATE("34.237752,109.074925");//坐标
     public static final String LOCAL = "local";
     public static final String REMOTE = "remote";
     private List<Film> films;
@@ -98,6 +98,8 @@ public class CatEyeClient {
                 System.out.println("网络请求获取");
                 return films;
             } catch (Exception e) {
+                System.out.println("需要过一下滑块 https://www.maoyan.com/");
+                e.printStackTrace();
                 //返回 data.json 文件
                 return readLocal();
             }
@@ -105,18 +107,20 @@ public class CatEyeClient {
 
     public static void main(String[] args) {
         CatEyeClient client = new CatEyeClient();
-//        System.out.println(client.getFilms());
-        Long movieId = 1451323L;
-//        List<String> dates = client.showDays(movieId);
-        String showDate = "2023-05-09";
+        System.out.println(client.getFilms());  // 获取热门电影
+        Long movieId = client.getFilms().get(0).getId();
+        List<String> dates = client.showDays(movieId);
+        System.out.println(dates);
+        String showDate = dates.get(0);
         List<Cinema> cinemas = client.cinemas(movieId, showDate);
-        List<Movie> movies = cinemas.get(0).show();
+//        List<Movie> movies = cinemas.get(0).show();
+        System.out.println(JSONObject.toJSONString(cinemas));
         List<MoviePList> moviePLists = cinemas.get(0).showTimes(showDate, movieId);
         System.out.println(JSONObject.toJSONString(moviePLists));
-        moviePLists.get(0).getSeats();
+//        moviePLists.get(0).getSeats();
     }
 
-    private List<Cinema> cinemas(Long movieId, String showDate) {
+    public List<Cinema> cinemas(Long movieId, String showDate) {
         JSONObject object = http.async("https://m.maoyan.com/api/mtrade/mmcs/cinema/v2/select/movie/cinemas.json")
                 .addUrlPara("movieId", movieId)
                 .addUrlPara("movieId", showDate)
@@ -140,7 +144,7 @@ public class CatEyeClient {
         return JSONArray.parseArray(data.getString("cinemas"), Cinema.class);
     }
 
-    private List<String> showDays(Long movieId) {
+    public List<String> showDays(Long movieId) {
         JSONObject object = http.async("https://m.maoyan.com/api/mtrade/mmcs/show/v1/movie/showdays.json")
                 .addUrlPara("movieId", movieId)
                 .addUrlPara("channelId", "4")

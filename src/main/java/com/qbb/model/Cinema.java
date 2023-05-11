@@ -168,7 +168,7 @@ public class Cinema {
     }
 
     public List<MoviePList> showTimes(String date, long movieId) {
-        Movie movie = movies.stream().filter(m -> m.getId() == movieId).findFirst().orElse(null);
+        Movie movie = show().stream().filter(m -> m.getId() == movieId).findFirst().orElse(null);
         if (movie != null) {
             List<MovieShow> shows = movie.getShows();
             MovieShow movieShow = shows.stream().filter(show -> show.getShowDate().equalsIgnoreCase(date)).findFirst().orElse(null);
