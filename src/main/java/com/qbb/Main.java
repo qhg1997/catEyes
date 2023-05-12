@@ -1,12 +1,15 @@
 package com.qbb;
 
-import cn.hutool.core.lang.ConsoleTable;
-import cn.hutool.db.meta.Column;
-import cn.hutool.db.meta.Table;
 import com.alibaba.fastjson.JSONObject;
 import com.qbb.model.*;
+import org.apache.commons.lang3.StringUtils;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
+import java.util.List;
 
 public class Main {
     CatEyeClient catEyeClient = new CatEyeClient(CatEyeClient.REMOTE);
@@ -75,26 +78,25 @@ public class Main {
         // 根据用户选择的序号来处理对应的放映日期
         String chosenDate = dates.get(dateChoice - 1);
         System.out.println();
-        System.out.print("您选择的放映日期是: " + chosenDate );
+        System.out.print("您选择的放映日期是: " + chosenDate);
 
 
         // 输出对应电影的影院名称和地址
-        System.out.println("以下是电影: '" + chosenFilm.getNm() +"' 在日期: '"+chosenDate+ "' 的影院信息: ");
+        System.out.println("以下是电影: '" + chosenFilm.getNm() + "' 在日期: '" + chosenDate + "' 的影院信息: ");
         System.out.println();
-        List<Cinema> cinemas = catEyeClient.cinemas(movieId,chosenDate);
+        List<Cinema> cinemas = catEyeClient.cinemas(movieId, chosenDate);
         //System.out.println(JSONObject.toJSONString(cinemas));
         int cinemaIndex = 1;
         for (Cinema cinema : cinemas) {
-            if (cinemaIndex <= 9){
+            if (cinemaIndex <= 9) {
                 System.out.println(cinemaIndex + ". 影院名称: " + cinema.getName());
-            }
-            else {
+            } else {
                 System.out.println(cinemaIndex + ".影院名称: " + cinema.getName());
             }
             System.out.println("   影院地址: " + cinema.getAddr());
-            System.out.println("   "+cinema.getShowTimes());
-            System.out.println("   "+cinema.getLabels());
-            System.out.println("   距离: "+cinema.getDistance());
+            System.out.println("   " + cinema.getShowTimes());
+            System.out.println("   " + cinema.getLabels());
+            System.out.println("   距离: " + cinema.getDistance());
             System.out.println();
             cinemaIndex++;
         }
@@ -123,16 +125,15 @@ public class Main {
         System.out.println();
         int showIndex = 1;
         for (MoviePList moviePList : moviePLists) {
-            if (showIndex <=9){
+            if (showIndex <= 9) {
                 System.out.println(showIndex + ". 放映时间: " + moviePList.getTm());
 
-            }
-            else {
+            } else {
                 System.out.println(showIndex + ".放映时间: " + moviePList.getTm());
 
             }
             System.out.println("   影厅: " + moviePList.getTh());
-            System.out.println("   语言版本: "+moviePList.getLang()+moviePList.getTp());
+            System.out.println("   语言版本: " + moviePList.getLang() + moviePList.getTp());
             System.out.println("   票价: " + moviePList.getVipPrice());
             System.out.println();
             showIndex++;
@@ -164,35 +165,36 @@ public class Main {
 
         // 输出座位信息
         SeatRegion seats = chosenShow.getSeats();
+        System.out.println(JSONObject.toJSONString(seats));
         System.out.println("座位图如下: ");
 
         // 添加顶部横线
         int lineWidth = seats.getRows().get(0).getSeats().size() * 8 + seats.getRegionName().length() + 24;
-        String horizontalLine = "-".repeat(lineWidth);
+        String horizontalLine = StringUtils.repeat("-", lineWidth);
         System.out.println(horizontalLine);
 
         System.out.println(seats.getRegionName() + " \t □未售 \t ■已售 \t ▧不可售");
-        HashMap<String, String> map = new HashMap<>();
+        HashMap<String, Seat> map = new HashMap<>();
         for (Row row : seats.getRows()) {
             for (Seat seat : row.getSeats()) {
-                map.put(seat.getNo(), seat.getSeatNo());
+                map.put(seat.getNo(), seat);
                 if (seat.getSeatNo().isEmpty()) { // 不是座位
                     System.out.print("\t\t");
                     continue;
                 }
                 if (seat.getSeatStatus() == 1) { // 可售
-                    System.out.print("\t\t□");
+                    System.out.print("\t\t" + (seat.getSeatType().equalsIgnoreCase("L") ? "[" : "") + "□" + (seat.getSeatType().equalsIgnoreCase("R") ? "]" : ""));
                 } else if (seat.getSeatStatus() == 3) { // 已售
-                    System.out.print("\t\t■");
+                    System.out.print("\t\t" + (seat.getSeatType().equalsIgnoreCase("L") ? "[" : "") + "■" + (seat.getSeatType().equalsIgnoreCase("R") ? "]" : ""));
                 } else if (seat.getSeatStatus() == 4) { // 不可售
-                    System.out.print("\t\t▧");
+                    System.out.print("\t\t" + (seat.getSeatType().equalsIgnoreCase("L") ? "[" : "") + "▧" + (seat.getSeatType().equalsIgnoreCase("R") ? "]" : ""));
                 } else {
                     System.out.print("\t\t");
                 }
             }
             System.out.println();
             for (Seat seat : row.getSeats()) {
-                if (seat.getSeatNo().isEmpty()) {
+                if (seat.getSeatNo().isEmpty() || seat.getSeatStatus() <= 0) {
                     System.out.print("\t\t");
                     continue;
                 }
@@ -208,21 +210,31 @@ public class Main {
         System.out.print("请输入座位号(如需多个座位请用' ; '分隔): ");
         String selectedSeats = scanner.next();
         System.out.println("您选择的座位如下: ");
+        List<Seat> selectSeats = new ArrayList<>();
         for (String key : selectedSeats.split(";")) {
-            String seatStatus = map.get(key); // 获取座位状态
-            if (seatStatus != null) {
-                if (seatStatus.equals("已售")) {
-                    System.out.println(key + " 已售");
-                } else {
-                    System.out.println(key + " 可售");
-                }
-            } else {
-                System.out.println(key + " 无效座位");
+            Seat seat = map.get(key);// 获取座位状态
+            if (seat == null) {
+                System.out.println("座位号" + key + "未找到,请检查!");
+                return;
             }
-            System.out.println(map.get(key));
+            int seatStatus = seat.getSeatStatus();
+            if (seatStatus != 1) {
+                System.out.println("座位号" + key + "已售或不可出售");
+                return;
+            }
+            selectSeats.add(seat);
+        }
+        System.out.println("您选择了以下座位号,正在下单:");
+        selectSeats.forEach(seat -> System.out.println(seat.getSeatNo()));
+        String link = catEyeClient.create(chosenShow.getSeqNo(), selectSeats);
+        // 获取当前系统桌面，并打开默认浏览器并访问指定网页
+        System.out.println("正在打开浏览器或点击链接去支付: " + link);
+        try {
+            Desktop.getDesktop().browse(new URI(link));
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
         }
     }
-
 
     public static void main(String[] args) {
         Main main = new Main();

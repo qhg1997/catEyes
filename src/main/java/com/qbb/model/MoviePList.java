@@ -337,13 +337,12 @@ public class MoviePList {
                 .addUrlPara("ci", "42")
                 .addUrlPara("channelId", "4")
                 .addUrlPara("version_name", "2.0.0")
-                .addHeader("Origin", "https://m.maoyan.com")
-                .addHeader("x-ta", "1")
-                .addHeader("token", "AgEtIyS_pXSqhR_8DiTTIIDotqkYOb-kh2vlusWLN-wVjz82Hhk6hvIeF-w7EkIhdajR2ZYqus9cCgAAAAAtGAAAKYtjL-1xpeb4eBdkfEemNOodBHWx9tO6GoMDK9W0_4H93EOI1a5XrfWgZLMOpYaf")
                 .post().getBody().toBean(JSONObject.class);
         if (!object.getBooleanValue("success"))
             throw new RuntimeException(object.getString("error"));
-        return JSONArray.parseArray(object.getJSONObject("data").getJSONObject("seat").getString("regions"), SeatRegion.class).get(0);
+        SeatRegion seatRegion = JSONArray.parseArray(object.getJSONObject("data").getJSONObject("seat").getString("regions"), SeatRegion.class).get(0);
+        seatRegion.getRows().forEach(row -> row.getSeats().forEach(seat -> seat.setSectionName(seatRegion.getRegionName())));
+        return seatRegion;
 
     }
 }

@@ -3,7 +3,6 @@ package com.qbb.model;
 import java.util.List;
 
 public class SeatRegion {
-
     private boolean canSell;
     private int columnSize;
     private boolean forbid;
