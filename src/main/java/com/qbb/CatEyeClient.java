@@ -9,16 +9,21 @@ import com.qbb.model.*;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class CatEyeClient {
     public static final COORDINATE COORDINATE = new COORDINATE("34.237752,109.074925");//坐标
-    static final String TOKEN = "AgGPIaAMFUWcBOz-4WDDisajG1WdVupouNI4mGRLIJbZzAwAh2bgmtjaJkBac4ZJ784YTlrm7DvkOAAAAAAtGAAAWQ-3lW9loZGT9CY07iQZn2DBdIhvAtT8WQo5DvBb2c1WOK31AvMbqBhpa-5zTg2H";
-    static final String COOKIE = "_lxsdk_cuid=187efb60d83c8-0820e17edd68a2-7e57547f-1fa400-187efb60d83c8; ci=42%2C%E8%A5%BF%E5%AE%89; ci.sig=PZGBSjtuxYBxy3RpGtyqcExoliU; uuid_n_v=v1; iuuid=8D64EE90EE0611EDB227EF36682DB7BBA6ED20326E3F431EBF6A15979AD939F0; WEBDFPID=93yv9y49w9375u2x1yw1848277w6v621812uuz071z39795871xxz68x-1998981488832-1683621488099WEOYWAGfd79fef3d01d5e9aadc18ccd4d0c95078855; ci=42%2C%E8%A5%BF%E5%AE%89; ci=42%2C%E8%A5%BF%E5%AE%89; selectci=true; selectci=true; selectci.sig=kdh2HVdzxNAXQp-kYQgChk2a2rw; _lx_utm=utm_source%3Dbing%26utm_medium%3Dorganic; featrues=[object Object]; featrues.sig=KbQquuOrr42L3kMHbtKc319ems8; uid=827044556; _last_page=c_dmLad; latlng=34.31724942269264%2C108.94262313449691%2C1683876547783; _lxsdk=CADB8960EBD511EDB1C0EF0226805F3B0589908ADD1B46BEB437FFC710BDFB48; token=AgGPIaAMFUWcBOz-4WDDisajG1WdVupouNI4mGRLIJbZzAwAh2bgmtjaJkBac4ZJ784YTlrm7DvkOAAAAAAtGAAAWQ-3lW9loZGT9CY07iQZn2DBdIhvAtT8WQo5DvBb2c1WOK31AvMbqBhpa-5zTg2H; _lxsdk_s=1880e7f0049-b16-a5d-69c%7C%7C779; token.sig=BmONIPj9V-21RCuiElX5ahnH59w; user=827044556%2CAgGPIaAMFUWcBOz-4WDDisajG1WdVupouNI4mGRLIJbZzAwAh2bgmtjaJkBac4ZJ784YTlrm7DvkOAAAAAAtGAAAWQ-3lW9loZGT9CY07iQZn2DBdIhvAtT8WQo5DvBb2c1WOK31AvMbqBhpa-5zTg2H";
+    // 浏览器登录猫眼账号后 按照 图 src/main/resources/获取Token&Cookie.png 去照token 和 cookie
+    static final String TOKEN = "";
+    static final String COOKIE = "";
     public static final HTTP http = HTTP.builder()
             .addMsgConvertor(new FastjsonMsgConvertor())
             .addPreprocessor((Preprocessor.PreChain chain) -> {
@@ -77,6 +82,22 @@ public class CatEyeClient {
     }
 
     private void init() {
+        if (StringUtils.isBlank(TOKEN) || StringUtils.isBlank(COOKIE)) {
+            Desktop desktop = Desktop.getDesktop();
+            File file = new File("src\\main\\resources\\获取Token&Cookie.png");
+            if (file.exists()) {
+                try {
+                    desktop.open(file);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("文件不存在");
+            }
+            System.out.println("请填写TOKEN和COOKIE");
+            throw new RuntimeException("请填写TOKEN和COOKIE");
+        }
+
         films = getAllFilms();
     }
 
