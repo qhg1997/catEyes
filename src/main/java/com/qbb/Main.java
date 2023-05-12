@@ -207,7 +207,7 @@ public class Main {
 
 
         // 选择座位
-        System.out.print("请输入座位号(如需多个座位请用' ; '分隔): ");
+        /*System.out.print("请输入座位号(如需多个座位请用' ; '分隔): ");
         String selectedSeats = scanner.next();
         System.out.println("您选择的座位如下: ");
         List<Seat> selectSeats = new ArrayList<>();
@@ -223,7 +223,36 @@ public class Main {
                 return;
             }
             selectSeats.add(seat);
+        }*/
+
+        // 选择座位
+        boolean seatSelected = false;
+        List<Seat> selectSeats = new ArrayList<>();
+
+        while (!seatSelected) {
+            System.out.print("请输入座位号(如需多个座位请用' ; '分隔): ");
+            String selectedSeats = scanner.next();
+            System.out.println("您选择的座位如下: ");
+            selectSeats.clear(); // 清空上次选择的座位
+
+            for (String key : selectedSeats.split(";")) {
+                Seat seat = map.get(key);// 获取座位状态
+                if (seat == null) {
+                    System.out.println("座位号" + key + "未找到,请检查!");
+                    seatSelected = false; // 座位未选择成功，继续循环输入
+                    break;
+                }
+                int seatStatus = seat.getSeatStatus();
+                if (seatStatus != 1) {
+                    System.out.println("座位号" + key + "已售或不可出售");
+                    seatSelected = false; // 座位未选择成功，继续循环输入
+                    break;
+                }
+                selectSeats.add(seat);
+                seatSelected = true; // 座位选择成功，跳出循环
+            }
         }
+
         System.out.println("您选择了以下座位号,正在下单:");
         selectSeats.forEach(seat -> System.out.println(seat.getSeatNo()));
         String link = catEyeClient.create(chosenShow.getSeqNo(), selectSeats);

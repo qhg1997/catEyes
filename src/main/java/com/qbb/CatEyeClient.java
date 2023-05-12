@@ -22,8 +22,10 @@ import java.util.stream.Collectors;
 public class CatEyeClient {
     public static final COORDINATE COORDINATE = new COORDINATE("34.237752,109.074925");//坐标
     // 浏览器登录猫眼账号后 按照 图 src/main/resources/获取Token&Cookie.png 去照token 和 cookie
-    static final String TOKEN = "";
-    static final String COOKIE = "";
+        static final String TOKEN = "AgEjJDwqpCdWfeKXSKzjpXMVMCW6PVi4iVxd9ewEOkhN5IWU1aNqCYY2CnLjaxpoZOTqrleFyuuc-wAAAAAtGAAA1tVd0ppuaJk_zgkhz2GuqFZP8WIQ3sFJY3LMydO00s89IYo6c1MlZsBv_DTHmSLk";
+        static final String COOKIE = "_lxsdk_cuid=187fa7ec200c8-0d7c665f56865a-4c657b58-186a00-187fa7ec201c8; WEBDFPID=x2u1zwz0xz72599015xuwux71u21u028812uz2u798y979585wu1wv85-1998894848645-1683534847759QKMAMKOfd79fef3d01d5e9aadc18ccd4d0c95077420; token=AgEjJDwqpCdWfeKXSKzjpXMVMCW6PVi4iVxd9ewEOkhN5IWU1aNqCYY2CnLjaxpoZOTqrleFyuuc-wAAAAAtGAAA1tVd0ppuaJk_zgkhz2GuqFZP8WIQ3sFJY3LMydO00s89IYo6c1MlZsBv_DTHmSLk; ci.sig=PZGBSjtuxYBxy3RpGtyqcExoliU; token.sig=sQlDYxI_Wq5dsU_m-PCZKpAdMSQ; uuid_n_v=v1; iuuid=7FD2E710EE3C11ED857D239EE7B0CBE1741959888B454E2593A7F52731951680; selectci=true; ci=42%2C%E8%A5%BF%E5%AE%89; ci=42%2C%E8%A5%BF%E5%AE%89; ci=42%2C%E8%A5%BF%E5%AE%89; selectci=true; selectci=true; selectci.sig=kdh2HVdzxNAXQp-kYQgChk2a2rw; _lxsdk=0A429750ED7B11EDB1C0EF0226805F3BE6B929DAE004438DA622D81AA03CC431; Hm_lvt_703e94591e87be68cc8da0da7cbd0be2=1683816600,1683816946,1683817693,1683898302; Hm_lpvt_703e94591e87be68cc8da0da7cbd0be2=1683898320; _lx_utm=utm_source%3Dbing%26utm_medium%3Dorganic; _lxsdk_s=1881028fd5d-d31-b16-486%7C%7C4; featrues=[object Object]; featrues.sig=KbQquuOrr42L3kMHbtKc319ems8; uid=3003032441; user=3003032441%2CAgEjJDwqpCdWfeKXSKzjpXMVMCW6PVi4iVxd9ewEOkhN5IWU1aNqCYY2CnLjaxpoZOTqrleFyuuc-wAAAAAtGAAA1tVd0ppuaJk_zgkhz2GuqFZP8WIQ3sFJY3LMydO00s89IYo6c1MlZsBv_DTHmSLk; _last_page=c_dmLad";
+   /* static final String TOKEN ="";
+    static final String COOKIE ="";*/
     public static final HTTP http = HTTP.builder()
             .addMsgConvertor(new FastjsonMsgConvertor())
             .addPreprocessor((Preprocessor.PreChain chain) -> {
